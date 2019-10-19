@@ -3,7 +3,7 @@ from builtins import str
 from builtins import object
 from .helpers import validate_params, validate_blogname
 from .request import TumblrRequest
-
+#Change back!!
 
 class TumblrRestClient(object):
     """
@@ -122,15 +122,29 @@ class TumblrRestClient(object):
         :param limit: an int, the number of results you want
         :param offset: an int, the offset of the posts you want to start at.
         :param before: an int, the timestamp for posts you want before.
-        :param filter: the post format you want returned: HTML, text or raw.
+        :param filter: the post format you want returned: HTML, text, raw, or formatted (text only)
         :param type: the type of posts you want returned, e.g. video. If omitted returns all post types.
-
         :returns: a dict created from the JSON response
         """
+
         if type is None:
             url = '/v2/blog/{}/posts'.format(blogname)
         else:
             url = '/v2/blog/{}/posts/{}'.format(blogname, type)
+
+        for key in kwargs:
+            if (kwargs.get('filter') == 'formatted'):
+                type = 'text'
+                kwargs['filter'] = 'text'
+                postDictionary = self.send_api_request("get", url, kwargs, ['id', 'tag', 'limit', 'offset', 'before', 'reblog_info', 'notes_info', 'filter', 'api_key'], True)
+
+                posts = postDictionary["posts"]
+                postarray = posts[0]
+                trail = postarray["trail"][0]
+                content = trail["content"]
+
+                return content
+        
         return self.send_api_request("get", url, kwargs, ['id', 'tag', 'limit', 'offset', 'before', 'reblog_info', 'notes_info', 'filter', 'api_key'], True)
 
     @validate_blogname

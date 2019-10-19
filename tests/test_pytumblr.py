@@ -66,6 +66,14 @@ class TumblrRestClientTest(unittest.TestCase):
         assert response['posts'] == []
 
     @mock.patch('requests.get')
+    def test_posts_with_format(self, mock_get):
+        mock_get.side_effect = wrap_response('{"meta": {"status": 200, "msg": "OK"}, "response": {"posts": [] } }')
+
+        response = self.client.posts('apptober', type='text', filter='formatted')
+
+        assert response['posts'] == []
+
+    @mock.patch('requests.get')
     def test_blogInfo(self, mock_get):
         mock_get.side_effect = wrap_response('{"meta": {"status": 200, "msg": "OK"}, "response": {"blog": {} } }')
 
